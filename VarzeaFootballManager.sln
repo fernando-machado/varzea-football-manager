@@ -11,7 +11,7 @@ Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "VarzeaFootballManager.Appli
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "VarzeaFootballManager.Domain", "src\VarzeaFootballManager.Domain\VarzeaFootballManager.Domain.xproj", "{A7310D42-845F-41B5-BF46-E506D1DD4865}"
 EndProject
-Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "VarzeaFootballManager.Infrasctructure", "src\VarzeaFootballManager.Infrasctructure\VarzeaFootballManager.Infrasctructure.xproj", "{1EA1E0E5-C654-47CB-968E-7F905528ED09}"
+Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "VarzeaFootballManager.Infrastructure", "src\VarzeaFootballManager.Infrastructure\VarzeaFootballManager.Infrastructure.xproj", "{1EA1E0E5-C654-47CB-968E-7F905528ED09}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
