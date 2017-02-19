@@ -1,12 +1,17 @@
-﻿using System;
-using System.IO;
+﻿using System.IO;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.PlatformAbstractions;
+using Newtonsoft.Json.Converters;
+using Newtonsoft.Json.Serialization;
 using Swashbuckle.AspNetCore.Swagger;
+using VarzeaFootballManager.Api.Extensions;
+using VarzeaFootballManager.Domain.Core;
+using VarzeaFootballManager.Domain.Jogadores;
+using VarzeaFootballManager.Persistence.Repositorios;
 
 namespace VarzeaFootballManager.Api
 {
@@ -31,7 +36,7 @@ namespace VarzeaFootballManager.Api
                 .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
                 .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
                 .AddEnvironmentVariables();
-            
+
             Configuration = builder.Build();
         }
 
@@ -42,18 +47,26 @@ namespace VarzeaFootballManager.Api
         /// <remarks>This method gets called by the runtime. Use this method to add services to the container.</remarks>
         public void ConfigureServices(IServiceCollection services)
         {
-            //var pathToDoc = Configuration["Swagger:Path"];
-            
-
             // Add framework services.
-            services.AddMvc();
+
+            services.AddSingleton(x => Configuration);
+
+            services.AddMvc().AddJsonOptions(options =>
+            {
+                var settings = options.SerializerSettings;
+
+                settings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+                    
+                //Convert Enums to Strings (instead of Integer) globally
+                settings.Converters.Insert(0, new StringEnumConverter { CamelCaseText = true });
+            });
 
             services.AddSwaggerGen(options =>
             {
                 options.SwaggerDoc("v1", new Info
                 {
                     Version = "v1",
-                    Title = "API Gerenciador App Futebol de Várzea",
+                    Title = "API do App Futebol de Várzea",
                     Description = "Uma api para gerenciar futebol amador.",
                     TermsOfService = "None"
                 });
@@ -64,9 +77,11 @@ namespace VarzeaFootballManager.Api
                 options.DescribeAllEnumsAsStrings();
             });
 
-            //services.AddScoped<ISearchProvider, SearchProvider>();
+            services.AddMongoDb(Configuration);
+
+            services.AddScoped<IRepository<Jogador>, Repository<Jogador>>();
         }
-        
+
         /// <summary>
         /// Configure services of Application
         /// </summary>
@@ -119,7 +134,7 @@ namespace VarzeaFootballManager.Api
 
             app.UseSwaggerUi(c =>
             {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "API Gerenciador App Futebol de Várzea V1");
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "API do App Futebol de Várzea V1");
             });
         }
     }

@@ -13,6 +13,11 @@ Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "VarzeaFootballManager.Domai
 EndProject
 Project("{8BB2217D-0F2D-49D1-97BC-3654ED321F3B}") = "VarzeaFootballManager.Infrastructure", "src\VarzeaFootballManager.Infrastructure\VarzeaFootballManager.Infrastructure.xproj", "{1EA1E0E5-C654-47CB-968E-7F905528ED09}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{38F03178-EBEF-483E-881A-55FCEB5CD927}"
+	ProjectSection(SolutionItems) = preProject
+		global.json = global.json
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

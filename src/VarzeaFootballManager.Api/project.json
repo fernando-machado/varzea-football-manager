@@ -18,7 +18,9 @@
     "Microsoft.AspNetCore.Server.IISIntegration.Tools": "1.1.0-preview4-final",
     "Swashbuckle.AspNetCore.Swagger": "1.0.0-rc1",
     "Swashbuckle.AspNetCore.SwaggerUi": "1.0.0-rc1",
-    "Swashbuckle.AspNetCore.SwaggerGen": "1.0.0-rc1"
+    "Swashbuckle.AspNetCore.SwaggerGen": "1.0.0-rc1",
+    "VarzeaFootballManager.Domain": "*",
+    "VarzeaFootballManager.Persistence": "*"
   },
 
   "frameworks": {
@@ -33,7 +35,8 @@
   "buildOptions": {
     "emitEntryPoint": true,
     "preserveCompilationContext": true,
-    "xmlDoc": true
+    "xmlDoc": true,
+    "define": [ "DEBUG" ]
   },
 
   "runtimeOptions": {

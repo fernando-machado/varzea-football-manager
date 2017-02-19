@@ -1,0 +1,41 @@
+{
+  "projects": [ "src", "test" ],
+  "sdk": {
+    "version": "1.0.0-preview2-003131"
+  }
+}
+
+{
+  "projects": [ "src", "test" ],
+  "sdk": {
+    "version": "1.0.0-preview4-004233"
+  }
+}
+
+
+//estudar sobre conventions nos mapeamentos do mongo
+//estudar como funciona o update no mongo
+//adicionar os métodos async e mudar as actions para utilizá-los
+//adicionar automapper
+
+//finalizar o curso do mongo
+//ddd e unit tests
+//hateoas
+
+
+
+//var mongoUrlBuilder = new MongoUrlBuilder(connectionString)
+//{
+//    ApplicationName = applicationName,
+//    DatabaseName = databaseName,
+//    Server = new MongoServerAddress("varzeamanager.documents.azure.com", 10250),
+//    Username = "varzeamanager",
+//    Password = "KWgMlMMb0LGTIkBQgBWsZktFhPWHD4eIshVAg4lQbBqw29cBf5zNNMVhFv8pvz245wrEcDKe3JnGFb3GsqOY8A==",
+//    Journal = true,
+//    UseSsl = true,
+//    VerifySslCertificate = false
+//};
+
+//var settings = MongoClientSettings.FromUrl(mongoUrlBuilder.ToMongoUrl());
+//settings.SslSettings = new SslSettings { EnabledSslProtocols = SslProtocols.Tls12 };
+

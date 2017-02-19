@@ -27,7 +27,7 @@ namespace VarzeaFootballManager.Api.Controllers
         /// </summary>
         /// <param name="id">Value Identifier</param>
         /// <returns>Returns a value of type <see cref="string"/></returns>
-        [HttpGet("{id}", Name = "GetById")]
+        [HttpGet("{id}", Name = "GetValueById")]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(IEnumerable<string>), (int)HttpStatusCode.NotFound)]
         public IActionResult Get(int id)
@@ -53,7 +53,7 @@ namespace VarzeaFootballManager.Api.Controllers
 
             const int createdId = 1;
             
-            return CreatedAtRoute("GetById", new { id = createdId }, value);
+            return CreatedAtRoute("GetValueById", new { id = createdId }, value);
         }
 
         /// <summary>
@@ -74,7 +74,7 @@ namespace VarzeaFootballManager.Api.Controllers
             if (id <= 0)
                 return NotFound();
 
-            return RedirectToRoute("GetById", new {id});
+            return RedirectToRoute("GetValueById", new {id});
         }
 
         /// <summary>
