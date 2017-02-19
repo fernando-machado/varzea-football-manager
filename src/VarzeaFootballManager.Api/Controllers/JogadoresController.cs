@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Net;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
+using System.Threading.Tasks;
 using VarzeaFootballManager.Api.ViewModels.Jogadores;
 using VarzeaFootballManager.Domain.Core;
 using VarzeaFootballManager.Domain.Jogadores;
@@ -34,17 +34,19 @@ namespace VarzeaFootballManager.Api.Controllers
         /// </summary>
         [HttpGet("", Name = "GetAllJogadores")]
         [ProducesResponseType(typeof(IEnumerable<JogadorGetAllDetailsViewModel>), (int)HttpStatusCode.OK)]
-        public IActionResult Get()
+        public async Task<IActionResult> Get()
         {
             var jogadores = _repositorioJogador.FindAll().ToList();
 
-            return Ok(jogadores.Select(jogador => new JogadorGetAllDetailsViewModel
+            var result = jogadores.Select(jogador => new JogadorGetAllDetailsViewModel
             {
                 Id = jogador.Id,
                 Nome = jogador.Nome,
                 Nivel = jogador.Nivel,
                 Posicao = jogador.Posicao
-            }).ToList());
+            }).ToList();
+
+            return Ok(result);
         }
 
         /// <summary>
@@ -54,7 +56,7 @@ namespace VarzeaFootballManager.Api.Controllers
         [HttpGet("{id}", Name = "GetJogadorById")]
         [ProducesResponseType(typeof(JogadorGetSingleViewModel), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        public IActionResult Get(string id)
+        public async Task<IActionResult> Get(string id)
         {
             if (string.IsNullOrWhiteSpace(id))
                 return BadRequest(new { message = $"O id='{id}' é inválido!" });
@@ -80,7 +82,7 @@ namespace VarzeaFootballManager.Api.Controllers
         [HttpPost("")]
         [ProducesResponseType(typeof(JogadorGetSingleViewModel), (int)HttpStatusCode.Created)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
-        public IActionResult Post([FromBody]JogadorPostViewModel viewModel)
+        public async Task<IActionResult> Post([FromBody]JogadorPostViewModel viewModel)
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
@@ -116,7 +118,7 @@ namespace VarzeaFootballManager.Api.Controllers
         [ProducesResponseType(typeof(JogadorGetSingleViewModel), (int)HttpStatusCode.OK)]
         [ProducesResponseType((int)HttpStatusCode.BadRequest)]
         [ProducesResponseType((int)HttpStatusCode.NotFound)]
-        public IActionResult Put(string id, [FromBody]JogadorPutViewModel viewModel)
+        public async Task<IActionResult> Put(string id, [FromBody]JogadorPutViewModel viewModel)
         {
             if (string.IsNullOrWhiteSpace(id))
                 return BadRequest(new { message = $"O id='{id}' é inválido!" });
@@ -156,7 +158,7 @@ namespace VarzeaFootballManager.Api.Controllers
         [HttpDelete("{id}")]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.OK)]
         [ProducesResponseType(typeof(string), (int)HttpStatusCode.BadRequest)]
-        public ActionResult Delete(string id)
+        public async Task<IActionResult> Delete(string id)
         {
             if (string.IsNullOrWhiteSpace(id))
                 return BadRequest(new { message = $"O id='{id}' é inválido!" });
