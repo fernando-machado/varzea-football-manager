@@ -3,8 +3,7 @@
 
   "dependencies": {
     "NETStandard.Library": "1.6.1",
-    "VarzeaFootballManager.Domain": "*",
-    "VarzeaFootballManager.Application": "*"
+    "VarzeaFootballManager.Domain": "*"
   },
 
   "frameworks": {

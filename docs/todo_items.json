@@ -17,6 +17,7 @@
 //estudar como funciona o update no mongo
 //adicionar os métodos async e mudar as actions para utilizá-los
 //adicionar automapper
+//https://gist.github.com/diegodfsd/c197a8cc0b63f9ce76b7
 
 //finalizar o curso do mongo
 //ddd e unit tests
