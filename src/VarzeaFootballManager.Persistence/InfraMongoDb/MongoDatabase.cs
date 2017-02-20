@@ -3,6 +3,7 @@ using System.Linq;
 using System.Reflection;
 using System.Security.Authentication;
 using MongoDB.Bson.Serialization;
+using MongoDB.Bson.Serialization.Conventions;
 using MongoDB.Driver;
 using VarzeaFootballManager.Domain.Core;
 using VarzeaFootballManager.Domain.Jogadores;
@@ -43,7 +44,44 @@ namespace VarzeaFootballManager.Persistence.InfraMongoDb
             var client = new MongoClient(settings);
             Database = client.GetDatabase(databaseName);
 
+            RegistrarConvencoes();
             RegistrarMapeamentos();
+        }
+
+        private void RegistrarConvencoes()
+        {
+            //var pack = new ConventionPack();
+            //pack.Add(new CamelCaseElementNameConvention());
+
+
+            //ConventionRegistry.Register(
+            //   "My Custom Conventions",
+            //   pack,
+            //   t => t.FullName.StartsWith("MyNamespace."));
+
+
+
+            // Class Stage: IClassMapConvention => Run against the class map.
+
+            // Member Stage: IMemberMapConvention => Run against each member map discovered during the Class stage.
+
+            // Creator Stage: ICreatorMapConvention => Run against each CreatorMap discovered during the Class stage.
+
+            // Post Processing Stage: IPostProcessingConvention => Run against the class map.
+
+            // If a custom implementation of an IPostProcessingConvention is registered before a customer implementation of an 
+            // IClassMapConvention, the IClassMapConvention will be run first because the Class Stage is before the Post Processing Stage.
+
+            //public class LowerCaseElementNameConvention : IMemberMapConvention
+            //{
+            //    public void Apply(BsonMemberMap memberMap)
+            //    {
+            //        memberMap.SetElementName(memberMap.MemberName.ToLower());
+            //    }
+            //}
+
+            //var pack = new ConventionPack();
+            //pack.AddMemberMapConvention("LowerCaseElementName", m => m.SetElementName(m.MemberName.ToLower()));
         }
 
         /// <summary>
