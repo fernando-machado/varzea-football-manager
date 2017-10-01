@@ -13,16 +13,43 @@ namespace VarzeaFootballManager.Api.Extensions
         /// <summary>
         /// Adiciona a injecao de dependência necessária para o MongoDb
         /// </summary>
-        /// <param name="self"></param>
-        /// <param name="config">Configuracoes do AppSettings</param>
+        /// <param name="services"></param>
         /// <returns>Returs <see cref="IServiceCollection"/></returns>
-        public static IServiceCollection AddMongoDb(this IServiceCollection self, IConfigurationRoot config)
+        public static IServiceCollection AddMongoDb(this IServiceCollection services)
         {
-            var configsMongoDb = config.GetSection("ConfiguracoesMongoDb");
-            var connectionString = configsMongoDb.GetValue<string>("ConnectionString");
-            var databaseName = configsMongoDb.GetValue<string>("DatabaseName");
+            //services.AddSingleton<MongoDB.Driver.IMongoClient>(provider =>
+            //{
+            //    var config = provider.GetService<IConfiguration>();
 
-            return self.AddSingleton<IDatabase>(new MongoDatabase(connectionString, databaseName));
+            //    var mongoConnectionString = config.GetSection("MongoDb").GetValue<string>("ConnectionString");
+
+            //    var mongoSettings = MongoDB.Driver.MongoClientSettings.FromUrl(MongoDB.Driver.MongoUrl.Create(mongoConnectionString));
+
+            //    return new MongoDB.Driver.MongoClient(mongoSettings);
+            //});
+
+
+            //services.AddSingleton<MongoDB.Driver.IMongoDatabase>(provider =>
+            //{
+            //    var config = provider.GetService<IConfiguration>();
+            //    var mongoClient = provider.GetService<MongoDB.Driver.IMongoClient>();
+                
+            //    var mongoDatabaseName = config.GetSection("MongoDb").GetValue<string>("DatabaseName");
+
+            //    return mongoClient.GetDatabase(mongoDatabaseName);
+            //});
+
+
+            return services.AddSingleton<IDatabase>(provider => 
+            {
+                var config = provider.GetService<IConfiguration>();
+
+                var configsMongoDb = config.GetSection("MongoDb");
+                var connectionString = configsMongoDb.GetValue<string>("ConnectionString");
+                var databaseName = configsMongoDb.GetValue<string>("DatabaseName");
+
+                return new MongoDatabase(connectionString, databaseName);
+            });
         }
     }
 }

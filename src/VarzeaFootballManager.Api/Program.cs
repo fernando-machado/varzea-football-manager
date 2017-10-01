@@ -1,4 +1,4 @@
-﻿using System.IO;
+﻿using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Hosting;
 
 namespace VarzeaFootballManager.Api
@@ -14,14 +14,17 @@ namespace VarzeaFootballManager.Api
         /// <param name="args">Arguments</param>
         public static void Main(string[] args)
         {
-            var host = new WebHostBuilder()
-                .UseKestrel()
-                .UseContentRoot(Directory.GetCurrentDirectory())
-                .UseIISIntegration()
+            BuildWebHost(args).Run();
+        }
+
+        /// <summary>
+        /// Build web host with startup configurations
+        /// </summary>
+        /// <param name="args"></param>
+        /// <returns>Returns WebHost created</returns>
+        public static IWebHost BuildWebHost(string[] args) =>
+            WebHost.CreateDefaultBuilder(args)
                 .UseStartup<Startup>()
                 .Build();
-
-            host.Run();
-        }
     }
 }

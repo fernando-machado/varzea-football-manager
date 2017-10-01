@@ -23,21 +23,15 @@ namespace VarzeaFootballManager.Api
         /// <summary>
         /// Configuration Root
         /// </summary>
-        public IConfigurationRoot Configuration { get; }
+        public IConfiguration Configuration { get; }
 
         /// <summary>
         /// Initialize instance of <see cref="Startup"/>
         /// </summary>
-        /// <param name="env">Hosting environment</param>
-        public Startup(IHostingEnvironment env)
+        /// <param name="configuration">Configuration</param>
+        public Startup(IConfiguration configuration)
         {
-            var builder = new ConfigurationBuilder()
-                .SetBasePath(env.ContentRootPath)
-                .AddJsonFile("appsettings.json", optional: true, reloadOnChange: true)
-                .AddJsonFile($"appsettings.{env.EnvironmentName}.json", optional: true)
-                .AddEnvironmentVariables();
-
-            Configuration = builder.Build();
+            Configuration = configuration;
         }
 
         /// <summary>
@@ -47,37 +41,25 @@ namespace VarzeaFootballManager.Api
         /// <remarks>This method gets called by the runtime. Use this method to add services to the container.</remarks>
         public void ConfigureServices(IServiceCollection services)
         {
-            // Add framework services.
+            services.AddSingleton<IConfiguration>(Configuration);
 
-            services.AddSingleton(x => Configuration);
-
-            services.AddMvc().AddJsonOptions(options =>
+            services.AddMvc().AddJsonOptions(c =>
             {
-                var settings = options.SerializerSettings;
-
-                settings.ContractResolver = new CamelCasePropertyNamesContractResolver();
-                    
-                //Convert Enums to Strings (instead of Integer) globally
-                settings.Converters.Insert(0, new StringEnumConverter { CamelCaseText = true });
+                c.SerializerSettings.ContractResolver = new CamelCasePropertyNamesContractResolver();
+                c.SerializerSettings.Converters.Insert(0, new StringEnumConverter { CamelCaseText = true });
             });
 
-            services.AddSwaggerGen(options =>
+            services.AddSwaggerGen(c =>
             {
-                options.SwaggerDoc("v1", new Info
-                {
-                    Version = "v1",
-                    Title = "API do App Futebol de Várzea",
-                    Description = "Uma api para gerenciar futebol amador.",
-                    TermsOfService = "None"
-                });
+                c.SwaggerDoc("v1", new Info { Version = "v1", Title = "API do App Futebol de Várzea", Description = "Uma api para gerenciar futebol amador." });
 
-                var xmlCommentsFilePath = Path.Combine(PlatformServices.Default.Application.ApplicationBasePath, "VarzeaFootballManager.Api.xml");
-                options.IncludeXmlComments(xmlCommentsFilePath);
+                c.IncludeXmlComments(Path.Combine(PlatformServices.Default.Application.ApplicationBasePath, "VarzeaFootballManager.Api.xml"));
 
-                options.DescribeAllEnumsAsStrings();
+                c.DescribeAllEnumsAsStrings();
+                c.DescribeStringEnumsInCamelCase();
             });
 
-            services.AddMongoDb(Configuration);
+            services.AddMongoDb();
 
             services.AddScoped<IRepository<Jogador>, Repository<Jogador>>();
         }
@@ -94,45 +76,46 @@ namespace VarzeaFootballManager.Api
             loggerFactory.AddConsole(Configuration.GetSection("Logging"));
             loggerFactory.AddDebug();
 
-            //if (env.IsDevelopment())
-            //{
-            //    app.UseDeveloperExceptionPage();
-            //    app.UseBrowserLink();
-            //}
-            //else
-            //{
-            //    app.UseExceptionHandler(builder =>
-            //    {
-            //        builder.Run(async context =>
-            //        {
-            //            context.Response.StatusCode = (int)System.Net.HttpStatusCode.InternalServerError;
-            //            context.Response.ContentType = "text/html";
+            if (env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+                app.UseBrowserLink();
+            }
+            else
+            {
+                app.UseExceptionHandler(builder =>
+                {
+                    builder.Run(async context =>
+                    {
+                        context.Response.StatusCode = (int)System.Net.HttpStatusCode.InternalServerError;
+                        context.Response.ContentType = "text/html";
 
-            //            var error = context.Features.Get<Microsoft.AspNetCore.Diagnostics.IExceptionHandlerFeature>();
-            //            if (error != null)
-            //            {
-            //                //LogException(error.Error, context);
-            //                await context.Response.WriteAsync("<h2>An error has occured in the website.</h2>").ConfigureAwait(false);
-            //            }
-            //        });
-            //    });
-            //}
+                        var error = context.Features.Get<Microsoft.AspNetCore.Diagnostics.IExceptionHandlerFeature>();
+                        if (error != null)
+                        {
+                            //LogException(error.Error, context);
+                            byte[] message = System.Text.Encoding.UTF8.GetBytes("<h2>An error has occured in the website.</h2>");
+                            await context.Response.Body.WriteAsync(message, 0, message.Length).ConfigureAwait(false);
+                        }
+                    });
+                });
+            }
 
             //app.UseStaticFiles();
 
-            //app.UseMvc(routes =>
-            //{
-            //    routes.MapRoute(
-            //        name: "default",
-            //        template: "{controller=Home}/{action=Index}/{id?}"
-            //    );
-            //});
-
-            app.UseMvc();
-
+            app.UseMvc(
+                //routes =>
+                //{
+                //    routes.MapRoute(
+                //        name: "default",
+                //        template: "{controller=Home}/{action=Index}/{id?}"
+                //    );
+                //}
+            );
+            
             app.UseSwagger();
 
-            app.UseSwaggerUi(c =>
+            app.UseSwaggerUI(c =>
             {
                 c.SwaggerEndpoint("/swagger/v1/swagger.json", "API do App Futebol de Várzea V1");
             });

@@ -36,12 +36,13 @@ namespace VarzeaFootballManager.Api.Controllers
         [ProducesResponseType(typeof(IEnumerable<JogadorGetAllDetailsViewModel>), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> Get()
         {
-            var jogadores = _repositorioJogador.FindAll().ToList();
+            var jogadores = await Task.Run(() => _repositorioJogador.FindAll().ToList());
 
             var result = jogadores.Select(jogador => new JogadorGetAllDetailsViewModel
             {
                 Id = jogador.Id,
                 Nome = jogador.Nome,
+                Idade = jogador.Idade,
                 Nivel = jogador.Nivel,
                 Posicao = jogador.Posicao
             }).ToList();
@@ -61,7 +62,7 @@ namespace VarzeaFootballManager.Api.Controllers
             if (string.IsNullOrWhiteSpace(id))
                 return BadRequest(new { message = $"O id='{id}' é inválido!" });
 
-            var jogador = _repositorioJogador.Get(id);
+            var jogador = await Task.Run(() => _repositorioJogador.Get(id));
 
             return Ok(new JogadorGetSingleViewModel
             {
@@ -95,7 +96,7 @@ namespace VarzeaFootballManager.Api.Controllers
                 Posicao = viewModel.Posicao
             };
 
-            _repositorioJogador.Insert(jogador);
+            await Task.Run(() => _repositorioJogador.Insert(jogador));
 
             return CreatedAtRoute("GetJogadorById", new { id = jogador.Id }, new JogadorGetSingleViewModel
             {
@@ -126,7 +127,7 @@ namespace VarzeaFootballManager.Api.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var jogador = _repositorioJogador.Get(id);
+            var jogador = await Task.Run(() => _repositorioJogador.Get(id));
 
             if (jogador == null)
                 return NotFound();
@@ -163,7 +164,7 @@ namespace VarzeaFootballManager.Api.Controllers
             if (string.IsNullOrWhiteSpace(id))
                 return BadRequest(new { message = $"O id='{id}' é inválido!" });
 
-            _repositorioJogador.Delete(id);
+            await Task.Run(() => _repositorioJogador.Delete(id));
 
             return Ok($"Jogador {id} removido com sucesso!");
         }
