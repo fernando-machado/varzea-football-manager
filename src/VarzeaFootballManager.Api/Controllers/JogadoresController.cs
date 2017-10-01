@@ -12,7 +12,7 @@ namespace VarzeaFootballManager.Api.Controllers
     /// <summary>
     /// Jogadores Controller
     /// </summary>
-    [Route("api/v1/[controller]")]
+    [Route("api/v1/jogadores")]
     public class JogadoresController : Controller
     {
         /// <summary>

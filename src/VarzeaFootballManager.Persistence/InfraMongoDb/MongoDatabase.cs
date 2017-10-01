@@ -22,24 +22,24 @@ namespace VarzeaFootballManager.Persistence.InfraMongoDb
         /// </summary>
         public MongoDatabase(string connectionString, string databaseName, string applicationName = "VarzeaManagerApi")
         {
-            var mongoUrlBuilder = new MongoUrlBuilder(connectionString)
-            {
-                ApplicationName = applicationName,
-                DatabaseName = databaseName,
-                Server = new MongoServerAddress("varzeamanager.documents.azure.com", 10250),
-                Username = "varzeamanager",
-                Password = "KWgMlMMb0LGTIkBQgBWsZktFhPWHD4eIshVAg4lQbBqw29cBf5zNNMVhFv8pvz245wrEcDKe3JnGFb3GsqOY8A==",
-                Journal = true,
-                UseSsl = true,
-                VerifySslCertificate = false
-            };
+            //var mongoUrlBuilder = new MongoUrlBuilder(connectionString)
+            //{
+            //    ApplicationName = applicationName,
+            //    DatabaseName = databaseName,
+            //    Server = new MongoServerAddress("varzeamanager.documents.azure.com", 10250),
+            //    Username = "varzeamanager",
+            //    Password = "",
+            //    Journal = true,
+            //    UseSsl = true,
+            //    VerifySslCertificate = false
+            //};
 
-            var settings = MongoClientSettings.FromUrl(mongoUrlBuilder.ToMongoUrl());
-            settings.SslSettings = new SslSettings { EnabledSslProtocols = SslProtocols.Tls12 };
+            //var settings = MongoClientSettings.FromUrl(mongoUrlBuilder.ToMongoUrl());
+            //settings.SslSettings = new SslSettings { EnabledSslProtocols = SslProtocols.Tls12 };
 
 
 
-            //var settings = MongoClientSettings.FromUrl(MongoUrl.Create(connectionString));
+            var settings = MongoClientSettings.FromUrl(MongoUrl.Create(connectionString));
 
             var client = new MongoClient(settings);
             Database = client.GetDatabase(databaseName);
