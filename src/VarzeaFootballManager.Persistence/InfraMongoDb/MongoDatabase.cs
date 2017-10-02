@@ -8,13 +8,15 @@ using MongoDB.Driver;
 using VarzeaFootballManager.Domain.Core;
 using VarzeaFootballManager.Domain.Jogadores;
 using VarzeaFootballManager.Persistence.Mapeamentos;
+using MongoDB.Driver.Core.Events;
+using MongoDB.Bson;
 
 namespace VarzeaFootballManager.Persistence.InfraMongoDb
 {
     public class MongoDatabase : IDatabase
     {
         #region Basic Context Infrastructure
-        
+
         private IMongoDatabase Database { get; }
 
         /// <summary>
@@ -38,8 +40,14 @@ namespace VarzeaFootballManager.Persistence.InfraMongoDb
             //settings.SslSettings = new SslSettings { EnabledSslProtocols = SslProtocols.Tls12 };
 
 
-
             var settings = MongoClientSettings.FromUrl(MongoUrl.Create(connectionString));
+
+#if DEBUG
+            settings.ClusterConfigurator = builder => builder.Subscribe<CommandStartedEvent>(e =>
+            {
+                var message = $"{e.CommandName} - {e.Command.ToJson()}";
+            });
+#endif
 
             var client = new MongoClient(settings);
             Database = client.GetDatabase(databaseName);

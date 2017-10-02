@@ -15,7 +15,7 @@ namespace VarzeaFootballManager.Persistence.Repositorios
     /// repository implementation for mongo
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public class Repository<T> : IRepository<T> where T : AggregateRoot
+    public class RepositoryAsync<T> : IRepositoryAsync<T> where T : AggregateRoot
     {
         #region MongoSpecific
 
@@ -23,7 +23,7 @@ namespace VarzeaFootballManager.Persistence.Repositorios
         /// constructor
         /// </summary>
         /// <param name="mongoDb">Mongo Database</param>
-        public Repository(IDatabase mongoDb)
+        public RepositoryAsync(IDatabase mongoDb)
         {
             Collection = mongoDb.GetCollection<T>();
         }
@@ -79,20 +79,20 @@ namespace VarzeaFootballManager.Persistence.Repositorios
         /// delete aggregateRoot
         /// </summary>
         /// <param name="aggregateRoot">aggregateRoot</param>
-        public void Delete(T aggregateRoot)
+        public async Task DeleteAsync(T aggregateRoot)
         {
-            Delete(aggregateRoot.Id);
+            await DeleteAsync(aggregateRoot.Id);
         }
 
         /// <summary>
         /// delete by id
         /// </summary>
         /// <param name="id">id</param>
-        public virtual void Delete(string id)
+        public virtual async Task DeleteAsync(string id)
         {
-            Retry(() =>
+            await Retry(() =>
             {
-                return Collection.DeleteOne(i => i.Id == id);
+                return Collection.DeleteOneAsync(i => i.Id == id);
             });
         }
 
@@ -100,11 +100,11 @@ namespace VarzeaFootballManager.Persistence.Repositorios
         /// delete items with filter
         /// </summary>
         /// <param name="filter">expression filter</param>
-        public virtual void Delete(Expression<Func<T, bool>> filter)
+        public virtual async Task DeleteAsync(Expression<Func<T, bool>> filter)
         {
-            Retry(() =>
+            await Retry(() =>
             {
-                return Collection.DeleteMany(filter);
+                return Collection.DeleteManyAsync(filter);
             });
         }
 
@@ -117,9 +117,9 @@ namespace VarzeaFootballManager.Persistence.Repositorios
         /// </summary>
         /// <param name="filter">expression filter</param>
         /// <returns>collection of aggregateRoot</returns>
-        public virtual IEnumerable<T> Find(Expression<Func<T, bool>> filter)
+        public async Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> filter)
         {
-            return Query(filter).ToList();
+            return await Query(filter).ToListAsync();
         }
 
         /// <summary>
@@ -129,9 +129,9 @@ namespace VarzeaFootballManager.Persistence.Repositorios
         /// <param name="pageIndex">page index, based on 0</param>
         /// <param name="size">number of items in page</param>
         /// <returns>collection of aggregateRoot</returns>
-        public IEnumerable<T> Find(Expression<Func<T, bool>> filter, int pageIndex, int size)
+        public async Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> filter, int pageIndex, int size)
         {
-            return Find(filter, i => i.Id, pageIndex, size);
+            return await FindAsync(filter, i => i.Id, pageIndex, size);
         }
 
         /// <summary>
@@ -143,9 +143,9 @@ namespace VarzeaFootballManager.Persistence.Repositorios
         /// <param name="pageIndex">page index, based on 0</param>
         /// <param name="size">number of items in page</param>
         /// <returns>collection of aggregateRoot</returns>
-        public IEnumerable<T> Find(Expression<Func<T, bool>> filter, Expression<Func<T, object>> order, int pageIndex, int size)
+        public async Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> filter, Expression<Func<T, object>> order, int pageIndex, int size)
         {
-            return Find(filter, order, pageIndex, size, true);
+            return await FindAsync(filter, order, pageIndex, size, true);
         }
 
         /// <summary>
@@ -157,11 +157,11 @@ namespace VarzeaFootballManager.Persistence.Repositorios
         /// <param name="size">number of items in page</param>
         /// <param name="isDescending">ordering direction</param>
         /// <returns>collection of aggregateRoot</returns>
-        public virtual IEnumerable<T> Find(Expression<Func<T, bool>> filter, Expression<Func<T, object>> order, int pageIndex, int size, bool isDescending)
+        public virtual async Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> filter, Expression<Func<T, object>> order, int pageIndex, int size, bool isDescending)
         {
-            return Retry(() =>
+            return await Retry(() =>
             {
-                return Query(filter, order, pageIndex, size, isDescending).ToList();
+                return Query(filter, order, pageIndex, size, isDescending).ToListAsync();
             });
         }
 
@@ -173,11 +173,11 @@ namespace VarzeaFootballManager.Persistence.Repositorios
         /// fetch all items in collection
         /// </summary>
         /// <returns>collection of aggregateRoot</returns>
-        public virtual IEnumerable<T> FindAll()
+        public virtual async Task<IEnumerable<T>> FindAllAsync()
         {
-            return Retry(() =>
+            return await Retry(() =>
             {
-                return Query().ToList();
+                return Query().ToListAsync();
             });
         }
 
@@ -187,9 +187,9 @@ namespace VarzeaFootballManager.Persistence.Repositorios
         /// <param name="pageIndex">page index, based on 0</param>
         /// <param name="size">number of items in page</param>
         /// <returns>collection of aggregateRoot</returns>
-        public IEnumerable<T> FindAll(int pageIndex, int size)
+        public async Task<IEnumerable<T>> FindAllAsync(int pageIndex, int size)
         {
-            return FindAll(i => i.Id, pageIndex, size);
+            return await FindAllAsync(i => i.Id, pageIndex, size);
         }
 
         /// <summary>
@@ -200,9 +200,9 @@ namespace VarzeaFootballManager.Persistence.Repositorios
         /// <param name="pageIndex">page index, based on 0</param>
         /// <param name="size">number of items in page</param>
         /// <returns>collection of aggregateRoot</returns>
-        public IEnumerable<T> FindAll(Expression<Func<T, object>> order, int pageIndex, int size)
+        public async Task<IEnumerable<T>> FindAllAsync(Expression<Func<T, object>> order, int pageIndex, int size)
         {
-            return FindAll(order, pageIndex, size, true);
+            return await FindAllAsync(order, pageIndex, size, true);
         }
 
         /// <summary>
@@ -213,11 +213,11 @@ namespace VarzeaFootballManager.Persistence.Repositorios
         /// <param name="size">number of items in page</param>
         /// <param name="isDescending">ordering direction</param>
         /// <returns>collection of aggregateRoot</returns>
-        public virtual IEnumerable<T> FindAll(Expression<Func<T, object>> order, int pageIndex, int size, bool isDescending)
+        public virtual async Task<IEnumerable<T>> FindAllAsync(Expression<Func<T, object>> order, int pageIndex, int size, bool isDescending)
         {
-            return Retry(() =>
+            return await Retry(() =>
             {
-                return Query(order, pageIndex, size, isDescending).ToList();
+                return Query(order, pageIndex, size, isDescending).ToListAsync();
             });
         }
 
@@ -229,9 +229,12 @@ namespace VarzeaFootballManager.Persistence.Repositorios
         /// get first item in collection
         /// </summary>
         /// <returns>aggregateRoot of <typeparamref name="T"/></returns>
-        public T First()
+        public virtual async Task<T> FirstAsync()
         {
-            return FindAll(i => i.Id, 0, 1, false).FirstOrDefault();
+            return await Retry(() =>
+            {
+                return Query(i => i.Id, 0, 1, false).FirstOrDefaultAsync();
+            });
         }
 
         /// <summary>
@@ -239,9 +242,9 @@ namespace VarzeaFootballManager.Persistence.Repositorios
         /// </summary>
         /// <param name="filter">expression filter</param>
         /// <returns>aggregateRoot of <typeparamref name="T"/></returns>
-        public T First(Expression<Func<T, bool>> filter)
+        public async Task<T> FirstAsync(Expression<Func<T, bool>> filter)
         {
-            return First(filter, i => i.Id);
+            return await FirstAsync(filter, i => i.Id);
         }
 
         /// <summary>
@@ -250,9 +253,9 @@ namespace VarzeaFootballManager.Persistence.Repositorios
         /// <param name="filter">expression filter</param>
         /// <param name="order">ordering parameters</param>
         /// <returns>aggregateRoot of <typeparamref name="T"/></returns>
-        public T First(Expression<Func<T, bool>> filter, Expression<Func<T, object>> order)
+        public async Task<T> FirstAsync(Expression<Func<T, bool>> filter, Expression<Func<T, object>> order)
         {
-            return First(filter, order, false);
+            return await FirstAsync(filter, order, false);
         }
 
         /// <summary>
@@ -262,9 +265,12 @@ namespace VarzeaFootballManager.Persistence.Repositorios
         /// <param name="order">ordering parameters</param>
         /// <param name="isDescending">ordering direction</param>
         /// <returns>aggregateRoot of <typeparamref name="T"/></returns>
-        public T First(Expression<Func<T, bool>> filter, Expression<Func<T, object>> order, bool isDescending)
+        public virtual async Task<T> FirstAsync(Expression<Func<T, bool>> filter, Expression<Func<T, object>> order, bool isDescending)
         {
-            return Find(filter, order, 0, 1, isDescending).SingleOrDefault();
+            return await Retry(() =>
+            {
+                return Query(filter, order, 0, 1, isDescending).SingleOrDefaultAsync();
+            });
         }
 
         #endregion First
@@ -276,11 +282,11 @@ namespace VarzeaFootballManager.Persistence.Repositorios
         /// </summary>
         /// <param name="id">id value</param>
         /// <returns>aggregateRoot of <typeparamref name="T"/></returns>
-        public virtual T Get(string id)
+        public virtual async Task<T> GetAsync(string id)
         {
-            return Retry(() =>
+            return await Retry(() =>
             {
-                return Find(i => i.Id == id).FirstOrDefault();
+                return Query(i => i.Id == id).FirstOrDefaultAsync();
             });
         }
 
@@ -292,12 +298,12 @@ namespace VarzeaFootballManager.Persistence.Repositorios
         /// insert aggregateRoot
         /// </summary>
         /// <param name="aggregateRoot">aggregateRoot</param>
-        public virtual void Insert(T aggregateRoot)
+        public virtual async Task InsertAsync(T aggregateRoot)
         {
-            Retry(() =>
+            await Retry(() =>
             {
-                Collection.InsertOne(aggregateRoot);
-                return true;
+                Collection.InsertOneAsync(aggregateRoot);
+                return Task.FromResult(true);
             });
         }
 
@@ -305,12 +311,12 @@ namespace VarzeaFootballManager.Persistence.Repositorios
         /// insert aggregateRoot collection
         /// </summary>
         /// <param name="entities">collection of entities</param>
-        public virtual void Insert(IEnumerable<T> entities)
+        public virtual async Task InsertAsync(IEnumerable<T> entities)
         {
-            Retry(() =>
+            await Retry(() =>
             {
-                Collection.InsertMany(entities);
-                return true;
+                Collection.InsertManyAsync(entities);
+                return Task.FromResult(true);
             });
         }
 
@@ -322,9 +328,9 @@ namespace VarzeaFootballManager.Persistence.Repositorios
         /// get first item in collection
         /// </summary>
         /// <returns>aggregateRoot of <typeparamref name="T"/></returns>
-        public T Last()
+        public async Task<T> LastAsync()
         {
-            return FindAll(i => i.Id, 0, 1, true).FirstOrDefault();
+            return await Query(i => i.Id, 0, 1, true).FirstOrDefaultAsync();
         }
 
         /// <summary>
@@ -332,9 +338,9 @@ namespace VarzeaFootballManager.Persistence.Repositorios
         /// </summary>
         /// <param name="filter">expression filter</param>
         /// <returns>aggregateRoot of <typeparamref name="T"/></returns>
-        public T Last(Expression<Func<T, bool>> filter)
+        public async Task<T> LastAsync(Expression<Func<T, bool>> filter)
         {
-            return Last(filter, i => i.Id);
+            return await LastAsync(filter, i => i.Id);
         }
 
         /// <summary>
@@ -343,9 +349,9 @@ namespace VarzeaFootballManager.Persistence.Repositorios
         /// <param name="filter">expression filter</param>
         /// <param name="order">ordering parameters</param>
         /// <returns>aggregateRoot of <typeparamref name="T"/></returns>
-        public T Last(Expression<Func<T, bool>> filter, Expression<Func<T, object>> order)
+        public async Task<T> LastAsync(Expression<Func<T, bool>> filter, Expression<Func<T, object>> order)
         {
-            return Last(filter, order, false);
+            return await LastAsync(filter, order, false);
         }
 
         /// <summary>
@@ -355,9 +361,9 @@ namespace VarzeaFootballManager.Persistence.Repositorios
         /// <param name="order">ordering parameters</param>
         /// <param name="isDescending">ordering direction</param>
         /// <returns>aggregateRoot of <typeparamref name="T"/></returns>
-        public T Last(Expression<Func<T, bool>> filter, Expression<Func<T, object>> order, bool isDescending)
+        public async Task<T> LastAsync(Expression<Func<T, bool>> filter, Expression<Func<T, object>> order, bool isDescending)
         {
-            return First(filter, order, !isDescending);
+            return await FirstAsync(filter, order, !isDescending);
         }
 
         #endregion Last
@@ -368,11 +374,11 @@ namespace VarzeaFootballManager.Persistence.Repositorios
         /// replace an existing aggregateRoot
         /// </summary>
         /// <param name="aggregateRoot">aggregateRoot</param>
-        public virtual void Replace(T aggregateRoot)
+        public virtual async Task ReplaceAsync(T aggregateRoot)
         {
-            Retry(() =>
+            await Retry(() =>
             {
-                return Collection.ReplaceOne(i => i.Id == aggregateRoot.Id, aggregateRoot);
+                return Collection.ReplaceOneAsync(i => i.Id == aggregateRoot.Id, aggregateRoot);
             });
         }
 
@@ -380,17 +386,65 @@ namespace VarzeaFootballManager.Persistence.Repositorios
         /// replace collection of entities
         /// </summary>
         /// <param name="entities">collection of entities</param>
-        public void Replace(IEnumerable<T> entities)
+        public async Task ReplaceAsync(IEnumerable<T> entities)
         {
+            var tasks = new List<Task>();
+
             foreach (var aggregateRoot in entities)
             {
-                Replace(aggregateRoot);
+                tasks.Add(ReplaceAsync(aggregateRoot));
             }
+
+            await Task.WhenAll(tasks);
         }
 
         #endregion Replace
 
         #region Update
+
+        /// <summary>
+        /// update an aggregateRoot with updated fields
+        /// </summary>
+        /// <param name="id">id</param>
+        /// <param name="updates">updated field(s)</param>
+        /// <returns>true if successful, otherwise false</returns>
+        public async Task<bool> UpdateAsync(string id, params UpdateDefinition<T>[] updates)
+        {
+            return await UpdateAsync(Filter.Eq(i => i.Id, id), updates);
+        }
+
+        /// <summary>
+        /// update an aggregateRoot with updated fields
+        /// </summary>
+        /// <param name="id">id</param>
+        /// <param name="updates">updated field(s)</param>
+        /// <returns>true if successful, otherwise false</returns>
+        public async Task<bool> UpdateAsync(string id, params Func<UpdateDefinitionBuilder<T>, UpdateDefinition<T>>[] updates)
+        {
+            return await UpdateAsync(id, updates.Select(update => update.Invoke(Updater)).ToArray());
+        }
+
+        /// <summary>
+        /// update an aggregateRoot with updated fields
+        /// </summary>
+        /// <param name="aggregateRoot">aggregateRoot</param>
+        /// <param name="updates">updated field(s)</param>
+        /// <returns>true if successful, otherwise false</returns>
+        public async Task<bool> UpdateAsync(T aggregateRoot, params UpdateDefinition<T>[] updates)
+        {
+            return await UpdateAsync(aggregateRoot.Id, updates);
+        }
+
+        /// <summary>
+        /// update an aggregateRoot with updated fields
+        /// </summary>
+        /// <param name="aggregateRoot">aggregateRoot</param>
+        /// <param name="updates">updated field(s)</param>
+        /// <returns>true if successful, otherwise false</returns>
+        public async Task<bool> UpdateAsync(T aggregateRoot, params Func<UpdateDefinitionBuilder<T>, UpdateDefinition<T>>[] updates)
+        {
+            return await UpdateAsync(aggregateRoot, updates.Select(update => update.Invoke(Updater)).ToArray());
+        }
 
         /// <summary>
         /// update a property field in an aggregateRoot
@@ -400,53 +454,9 @@ namespace VarzeaFootballManager.Persistence.Repositorios
         /// <param name="field">field</param>
         /// <param name="value">new value</param>
         /// <returns>true if successful, otherwise false</returns>
-        public bool Update<TField>(T aggregateRoot, Expression<Func<T, TField>> field, TField value)
+        public async Task<bool> UpdateAsync<TField>(T aggregateRoot, Expression<Func<T, TField>> field, TField value)
         {
-            return Update(aggregateRoot, Updater.Set(field, value));
-        }
-
-        /// <summary>
-        /// update an aggregateRoot with updated fields
-        /// </summary>
-        /// <param name="id">id</param>
-        /// <param name="updates">updated field(s)</param>
-        /// <returns>true if successful, otherwise false</returns>
-        public virtual bool Update(string id, params UpdateDefinition<T>[] updates)
-        {
-            return Update(Filter.Eq(i => i.Id, id), updates);
-        }
-
-        /// <summary>
-        /// update an aggregateRoot with updated fields
-        /// </summary>
-        /// <param name="aggregateRoot">aggregateRoot</param>
-        /// <param name="updates">updated field(s)</param>
-        /// <returns>true if successful, otherwise false</returns>
-        public virtual bool Update(T aggregateRoot, params UpdateDefinition<T>[] updates)
-        {
-            return Update(aggregateRoot.Id, updates);
-        }
-
-        /// <summary>
-        /// update an aggregateRoot with updated fields
-        /// </summary>
-        /// <param name="id">id</param>
-        /// <param name="updates">updated field(s)</param>
-        /// <returns>true if successful, otherwise false</returns>
-        public virtual bool Update(string id, params Func<UpdateDefinitionBuilder<T>, UpdateDefinition<T>>[] updates)
-        {
-            return Update(id, updates.Select(update => update.Invoke(Updater)).ToArray());
-        }
-
-        /// <summary>
-        /// update an aggregateRoot with updated fields
-        /// </summary>
-        /// <param name="aggregateRoot">aggregateRoot</param>
-        /// <param name="updates">updated field(s)</param>
-        /// <returns>true if successful, otherwise false</returns>
-        public virtual bool Update(T aggregateRoot, params Func<UpdateDefinitionBuilder<T>, UpdateDefinition<T>>[] updates)
-        {
-            return Update(aggregateRoot, updates.Select(update => update.Invoke(Updater)).ToArray());
+            return await UpdateAsync(aggregateRoot, Updater.Set(field, value));
         }
 
         /// <summary>
@@ -457,9 +467,9 @@ namespace VarzeaFootballManager.Persistence.Repositorios
         /// <param name="field">field</param>
         /// <param name="value">new value</param>
         /// <returns>true if successful, otherwise false</returns>
-        public bool Update<TField>(FilterDefinition<T> filter, Expression<Func<T, TField>> field, TField value)
+        public async Task<bool> UpdateAsync<TField>(FilterDefinition<T> filter, Expression<Func<T, TField>> field, TField value)
         {
-            return Update(filter, Updater.Set(field, value));
+            return await UpdateAsync(filter, Updater.Set(field, value));
         }
 
         /// <summary>
@@ -468,12 +478,12 @@ namespace VarzeaFootballManager.Persistence.Repositorios
         /// <param name="filter">collection filter</param>
         /// <param name="updates">updated field(s)</param>
         /// <returns>true if successful, otherwise false</returns>
-        public bool Update(FilterDefinition<T> filter, params UpdateDefinition<T>[] updates)
+        public virtual async Task<bool> UpdateAsync(FilterDefinition<T> filter, params UpdateDefinition<T>[] updates)
         {
-            return Retry(() =>
+            return await Retry(async () =>
             {
                 var update = Updater.Combine(updates).CurrentDate(i => i.ModifiedAt);
-                return Collection.UpdateMany(filter, update.CurrentDate(i => i.ModifiedAt)).IsAcknowledged;
+                return (await Collection.UpdateManyAsync(filter, update.CurrentDate(i => i.ModifiedAt))).IsAcknowledged;
             });
         }
 
@@ -483,12 +493,12 @@ namespace VarzeaFootballManager.Persistence.Repositorios
         /// <param name="filter">collection filter</param>
         /// <param name="updates">updated field(s)</param>
         /// <returns>true if successful, otherwise false</returns>
-        public bool Update(Expression<Func<T, bool>> filter, params UpdateDefinition<T>[] updates)
+        public virtual async Task<bool> UpdateAsync(Expression<Func<T, bool>> filter, params UpdateDefinition<T>[] updates)
         {
-            return Retry(() =>
+            return await Retry(async () =>
             {
                 var update = Updater.Combine(updates).CurrentDate(i => i.ModifiedAt);
-                return Collection.UpdateMany(filter, update).IsAcknowledged;
+                return (await Collection.UpdateManyAsync(filter, update)).IsAcknowledged;
             });
         }
 
@@ -503,11 +513,11 @@ namespace VarzeaFootballManager.Persistence.Repositorios
         /// </summary>
         /// <param name="filter"></param>
         /// <returns>true if exists, otherwise false</returns>
-        public bool Any(Expression<Func<T, bool>> filter)
+        public virtual async Task<bool> AnyAsync(Expression<Func<T, bool>> filter)
         {
-            return Retry(() =>
+            return await Retry(() =>
             {
-                return Collection.AsQueryable<T>().Any(filter);
+                return Query(filter).AnyAsync();
             });
         }
 
@@ -527,7 +537,7 @@ namespace VarzeaFootballManager.Persistence.Repositorios
         ///     return something;
         /// });
         /// </example>
-        protected virtual TResult Retry<TResult>(Func<TResult> action)
+        protected TResult Retry<TResult>(Func<TResult> action)
         {
             return RetryPolicy
                 .Handle<MongoConnectionException>(i => i.InnerException.GetType() == typeof(IOException))

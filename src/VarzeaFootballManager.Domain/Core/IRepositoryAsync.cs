@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq.Expressions;
 using MongoDB.Driver;
+using System.Threading.Tasks;
 
 namespace VarzeaFootballManager.Domain.Core
 {
@@ -9,7 +10,7 @@ namespace VarzeaFootballManager.Domain.Core
     /// mongo based repository interface
     /// </summary>
     /// <typeparam name="T"></typeparam>
-    public interface IRepository<T> where T : AggregateRoot
+    public interface IRepositoryAsync<T> where T : AggregateRoot
     {
         #region MongoSpecific
 
@@ -43,19 +44,19 @@ namespace VarzeaFootballManager.Domain.Core
         /// delete by id
         /// </summary>
         /// <param name="id">id</param>
-        void Delete(string id);
+        Task DeleteAsync(string id);
 
         /// <summary>
         /// delete aggregateRoot
         /// </summary>
         /// <param name="aggregateRoot">aggregateRoot</param>
-        void Delete(T aggregateRoot);
+        Task DeleteAsync(T aggregateRoot);
 
         /// <summary>
         /// delete items with filter
         /// </summary>
         /// <param name="filter">expression filter</param>
-        void Delete(Expression<Func<T, bool>> filter);
+        Task DeleteAsync(Expression<Func<T, bool>> filter);
 
         #endregion Delete
 
@@ -66,7 +67,7 @@ namespace VarzeaFootballManager.Domain.Core
         /// </summary>
         /// <param name="filter">expression filter</param>
         /// <returns>collection of aggregateRoot</returns>
-        IEnumerable<T> Find(Expression<Func<T, bool>> filter);
+        Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> filter);
 
         /// <summary>
         /// find entities with paging
@@ -75,7 +76,7 @@ namespace VarzeaFootballManager.Domain.Core
         /// <param name="pageIndex">page index, based on 0</param>
         /// <param name="size">number of items in page</param>
         /// <returns>collection of aggregateRoot</returns>
-        IEnumerable<T> Find(Expression<Func<T, bool>> filter, int pageIndex, int size);
+        Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> filter, int pageIndex, int size);
 
         /// <summary>
         /// find entities with paging and ordering
@@ -86,7 +87,7 @@ namespace VarzeaFootballManager.Domain.Core
         /// <param name="pageIndex">page index, based on 0</param>
         /// <param name="size">number of items in page</param>
         /// <returns>collection of aggregateRoot</returns>
-        IEnumerable<T> Find(Expression<Func<T, bool>> filter, Expression<Func<T, object>> order, int pageIndex, int size);
+        Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> filter, Expression<Func<T, object>> order, int pageIndex, int size);
 
         /// <summary>
         /// find entities with paging and ordering in direction
@@ -97,7 +98,7 @@ namespace VarzeaFootballManager.Domain.Core
         /// <param name="size">number of items in page</param>
         /// <param name="isDescending">ordering direction</param>
         /// <returns>collection of aggregateRoot</returns>
-        IEnumerable<T> Find(Expression<Func<T, bool>> filter, Expression<Func<T, object>> order, int pageIndex, int size, bool isDescending);
+        Task<IEnumerable<T>> FindAsync(Expression<Func<T, bool>> filter, Expression<Func<T, object>> order, int pageIndex, int size, bool isDescending);
 
         #endregion Find
 
@@ -107,7 +108,7 @@ namespace VarzeaFootballManager.Domain.Core
         /// fetch all items in collection
         /// </summary>
         /// <returns>collection of aggregateRoot</returns>
-        IEnumerable<T> FindAll();
+        Task<IEnumerable<T>> FindAllAsync();
 
         /// <summary>
         /// fetch all items in collection with paging
@@ -115,7 +116,7 @@ namespace VarzeaFootballManager.Domain.Core
         /// <param name="pageIndex">page index, based on 0</param>
         /// <param name="size">number of items in page</param>
         /// <returns>collection of aggregateRoot</returns>
-        IEnumerable<T> FindAll(int pageIndex, int size);
+        Task<IEnumerable<T>> FindAllAsync(int pageIndex, int size);
 
         /// <summary>
         /// fetch all items in collection with paging and ordering
@@ -125,7 +126,7 @@ namespace VarzeaFootballManager.Domain.Core
         /// <param name="pageIndex">page index, based on 0</param>
         /// <param name="size">number of items in page</param>
         /// <returns>collection of aggregateRoot</returns>
-        IEnumerable<T> FindAll(Expression<Func<T, object>> order, int pageIndex, int size);
+        Task<IEnumerable<T>> FindAllAsync(Expression<Func<T, object>> order, int pageIndex, int size);
 
         /// <summary>
         /// fetch all items in collection with paging and ordering in direction
@@ -135,7 +136,7 @@ namespace VarzeaFootballManager.Domain.Core
         /// <param name="size">number of items in page</param>
         /// <param name="isDescending">ordering direction</param>
         /// <returns>collection of aggregateRoot</returns>
-        IEnumerable<T> FindAll(Expression<Func<T, object>> order, int pageIndex, int size, bool isDescending);
+        Task<IEnumerable<T>> FindAllAsync(Expression<Func<T, object>> order, int pageIndex, int size, bool isDescending);
 
         #endregion FindAll
 
@@ -145,14 +146,14 @@ namespace VarzeaFootballManager.Domain.Core
         /// get first item in collection
         /// </summary>
         /// <returns>aggregateRoot of <typeparamref name="T"/></returns>
-        T First();
+        Task<T> FirstAsync();
 
         /// <summary>
         /// get first item in query
         /// </summary>
         /// <param name="filter">expression filter</param>
         /// <returns>aggregateRoot of <typeparamref name="T"/></returns>
-        T First(Expression<Func<T, bool>> filter);
+        Task<T> FirstAsync(Expression<Func<T, bool>> filter);
 
         /// <summary>
         /// get first item in query with order
@@ -160,7 +161,7 @@ namespace VarzeaFootballManager.Domain.Core
         /// <param name="filter">expression filter</param>
         /// <param name="order">ordering parameters</param>
         /// <returns>aggregateRoot of <typeparamref name="T"/></returns>
-        T First(Expression<Func<T, bool>> filter, Expression<Func<T, object>> order);
+        Task<T> FirstAsync(Expression<Func<T, bool>> filter, Expression<Func<T, object>> order);
 
         /// <summary>
         /// get first item in query with order and direction
@@ -169,7 +170,7 @@ namespace VarzeaFootballManager.Domain.Core
         /// <param name="order">ordering parameters</param>
         /// <param name="isDescending">ordering direction</param>
         /// <returns>aggregateRoot of <typeparamref name="T"/></returns>
-        T First(Expression<Func<T, bool>> filter, Expression<Func<T, object>> order, bool isDescending);
+        Task<T> FirstAsync(Expression<Func<T, bool>> filter, Expression<Func<T, object>> order, bool isDescending);
 
         #endregion First
 
@@ -180,7 +181,7 @@ namespace VarzeaFootballManager.Domain.Core
         /// </summary>
         /// <param name="id">id value</param>
         /// <returns>aggregateRoot of <typeparamref name="T"/></returns>
-        T Get(string id);
+        Task<T> GetAsync(string id);
 
         #endregion Get
 
@@ -190,13 +191,13 @@ namespace VarzeaFootballManager.Domain.Core
         /// insert aggregateRoot
         /// </summary>
         /// <param name="aggregateRoot">aggregateRoot</param>
-        void Insert(T aggregateRoot);
+        Task InsertAsync(T aggregateRoot);
 
         /// <summary>
         /// insert aggregateRoot collection
         /// </summary>
         /// <param name="entities">collection of entities</param>
-        void Insert(IEnumerable<T> entities);
+        Task InsertAsync(IEnumerable<T> entities);
 
         #endregion Insert
 
@@ -206,14 +207,14 @@ namespace VarzeaFootballManager.Domain.Core
         /// get last item in collection
         /// </summary>
         /// <returns>aggregateRoot of <typeparamref name="T"/></returns>
-        T Last();
+        Task<T> LastAsync();
 
         /// <summary>
         /// get last item in query
         /// </summary>
         /// <param name="filter">expression filter</param>
         /// <returns>aggregateRoot of <typeparamref name="T"/></returns>
-        T Last(Expression<Func<T, bool>> filter);
+        Task<T> LastAsync(Expression<Func<T, bool>> filter);
 
         /// <summary>
         /// get last item in query with order
@@ -221,7 +222,7 @@ namespace VarzeaFootballManager.Domain.Core
         /// <param name="filter">expression filter</param>
         /// <param name="order">ordering parameters</param>
         /// <returns>aggregateRoot of <typeparamref name="T"/></returns>
-        T Last(Expression<Func<T, bool>> filter, Expression<Func<T, object>> order);
+        Task<T> LastAsync(Expression<Func<T, bool>> filter, Expression<Func<T, object>> order);
 
         /// <summary>
         /// get last item in query with order and direction
@@ -230,7 +231,7 @@ namespace VarzeaFootballManager.Domain.Core
         /// <param name="order">ordering parameters</param>
         /// <param name="isDescending">ordering direction</param>
         /// <returns>aggregateRoot of <typeparamref name="T"/></returns>
-        T Last(Expression<Func<T, bool>> filter, Expression<Func<T, object>> order, bool isDescending);
+        Task<T> LastAsync(Expression<Func<T, bool>> filter, Expression<Func<T, object>> order, bool isDescending);
 
         #endregion Last
 
@@ -240,13 +241,13 @@ namespace VarzeaFootballManager.Domain.Core
         /// replace an existing aggregateRoot
         /// </summary>
         /// <param name="aggregateRoot">aggregateRoot</param>
-        void Replace(T aggregateRoot);
+        Task ReplaceAsync(T aggregateRoot);
 
         /// <summary>
         /// replace collection of entities
         /// </summary>
         /// <param name="entities">collection of entities</param>
-        void Replace(IEnumerable<T> entities);
+        Task ReplaceAsync(IEnumerable<T> entities);
 
         #endregion Replace
 
@@ -258,7 +259,7 @@ namespace VarzeaFootballManager.Domain.Core
         /// <param name="id">id</param>
         /// <param name="updates">updated field(s)</param>
         /// <returns>true if successful, otherwise false</returns>
-        bool Update(string id, params UpdateDefinition<T>[] updates);
+        Task<bool> UpdateAsync(string id, params UpdateDefinition<T>[] updates);
 
         /// <summary>
         /// update an aggregateRoot with updated fields
@@ -266,7 +267,7 @@ namespace VarzeaFootballManager.Domain.Core
         /// <param name="id">id</param>
         /// <param name="updates">updated field(s)</param>
         /// <returns>true if successful, otherwise false</returns>
-        bool Update(string id, params Func<UpdateDefinitionBuilder<T>, UpdateDefinition<T>>[] updates);
+        Task<bool> UpdateAsync(string id, params Func<UpdateDefinitionBuilder<T>, UpdateDefinition<T>>[] updates);
 
         /// <summary>
         /// update an aggregateRoot with updated fields
@@ -274,7 +275,7 @@ namespace VarzeaFootballManager.Domain.Core
         /// <param name="aggregateRoot">aggregateRoot</param>
         /// <param name="updates">updated field(s)</param>
         /// <returns>true if successful, otherwise false</returns>
-        bool Update(T aggregateRoot, params UpdateDefinition<T>[] updates);
+        Task<bool> UpdateAsync(T aggregateRoot, params UpdateDefinition<T>[] updates);
 
         /// <summary>
         /// update an aggregateRoot with updated fields
@@ -282,23 +283,7 @@ namespace VarzeaFootballManager.Domain.Core
         /// <param name="aggregateRoot">aggregateRoot</param>
         /// <param name="updates">updated field(s)</param>
         /// <returns>true if successful, otherwise false</returns>
-        bool Update(T aggregateRoot, params Func<UpdateDefinitionBuilder<T>, UpdateDefinition<T>>[] updates);
-
-        /// <summary>
-        /// update found entities by filter with updated fields
-        /// </summary>
-        /// <param name="filter">collection filter</param>
-        /// <param name="updates">updated field(s)</param>
-        /// <returns>true if successful, otherwise false</returns>
-        bool Update(FilterDefinition<T> filter, params UpdateDefinition<T>[] updates);
-
-        /// <summary>
-        /// update found entities by filter with updated fields
-        /// </summary>
-        /// <param name="filter">collection filter</param>
-        /// <param name="updates">updated field(s)</param>
-        /// <returns>true if successful, otherwise false</returns>
-        bool Update(Expression<Func<T, bool>> filter, params UpdateDefinition<T>[] updates);
+        Task<bool> UpdateAsync(T aggregateRoot, params Func<UpdateDefinitionBuilder<T>, UpdateDefinition<T>>[] updates);
 
         /// <summary>
         /// update a property field in an aggregateRoot
@@ -308,7 +293,7 @@ namespace VarzeaFootballManager.Domain.Core
         /// <param name="field">field</param>
         /// <param name="value">new value</param>
         /// <returns>true if successful, otherwise false</returns>
-        bool Update<TField>(T aggregateRoot, Expression<Func<T, TField>> field, TField value);
+        Task<bool> UpdateAsync<TField>(T aggregateRoot, Expression<Func<T, TField>> field, TField value);
 
         /// <summary>
         /// update a property field in entities
@@ -318,7 +303,23 @@ namespace VarzeaFootballManager.Domain.Core
         /// <param name="field">field</param>
         /// <param name="value">new value</param>
         /// <returns>true if successful, otherwise false</returns>
-        bool Update<TField>(FilterDefinition<T> filter, Expression<Func<T, TField>> field, TField value);
+        Task<bool> UpdateAsync<TField>(FilterDefinition<T> filter, Expression<Func<T, TField>> field, TField value);
+
+        /// <summary>
+        /// update found entities by filter with updated fields
+        /// </summary>
+        /// <param name="filter">collection filter</param>
+        /// <param name="updates">updated field(s)</param>
+        /// <returns>true if successful, otherwise false</returns>
+        Task<bool> UpdateAsync(FilterDefinition<T> filter, params UpdateDefinition<T>[] updates);
+
+        /// <summary>
+        /// update found entities by filter with updated fields
+        /// </summary>
+        /// <param name="filter">collection filter</param>
+        /// <param name="updates">updated field(s)</param>
+        /// <returns>true if successful, otherwise false</returns>
+        Task<bool> UpdateAsync(Expression<Func<T, bool>> filter, params UpdateDefinition<T>[] updates);
 
         #endregion Update
 
@@ -331,7 +332,7 @@ namespace VarzeaFootballManager.Domain.Core
         /// </summary>
         /// <param name="filter"></param>
         /// <returns>true if exists, otherwise false</returns>
-        bool Any(Expression<Func<T, bool>> filter);
+        Task<bool> AnyAsync(Expression<Func<T, bool>> filter);
 
         #endregion Simplicity
     }

@@ -4,6 +4,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 VisualStudioVersion = 15.0.26730.16
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{38F03178-EBEF-483E-881A-55FCEB5CD927}"
+	ProjectSection(SolutionItems) = preProject
+		docs\todo_items.json = docs\todo_items.json
+	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "VarzeaFootballManager.Api", "src\VarzeaFootballManager.Api\VarzeaFootballManager.Api.csproj", "{DF29C901-C0B4-46F8-AA0F-C8D3703A5BE1}"
 EndProject

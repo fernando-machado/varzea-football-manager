@@ -12,6 +12,7 @@ using VarzeaFootballManager.Api.Extensions;
 using VarzeaFootballManager.Domain.Core;
 using VarzeaFootballManager.Domain.Jogadores;
 using VarzeaFootballManager.Persistence.Repositorios;
+using VarzeaFootballManager.Api.Mappers;
 
 namespace VarzeaFootballManager.Api
 {
@@ -61,7 +62,10 @@ namespace VarzeaFootballManager.Api
 
             services.AddMongoDb();
 
+            AutomapperConfig.RegisterMappings();
+
             services.AddScoped<IRepository<Jogador>, Repository<Jogador>>();
+            services.AddScoped<IRepositoryAsync<Jogador>, RepositoryAsync<Jogador>>();
         }
 
         /// <summary>

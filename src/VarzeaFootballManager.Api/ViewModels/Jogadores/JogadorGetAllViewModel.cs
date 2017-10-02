@@ -10,6 +10,6 @@ namespace VarzeaFootballManager.Api.ViewModels.Jogadores
         /// <summary>
         /// 
         /// </summary>
-        public IList<JogadorGetAllDetailsViewModel> Jogadores { get; set; }
+        public IEnumerable<JogadorGetAllDetailsViewModel> Jogadores { get; set; }
     }
 }

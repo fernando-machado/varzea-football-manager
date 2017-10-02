@@ -6,6 +6,7 @@ using System.Threading.Tasks;
 using VarzeaFootballManager.Api.ViewModels.Jogadores;
 using VarzeaFootballManager.Domain.Core;
 using VarzeaFootballManager.Domain.Jogadores;
+using AutoMapper;
 
 namespace VarzeaFootballManager.Api.Controllers
 {
@@ -18,13 +19,13 @@ namespace VarzeaFootballManager.Api.Controllers
         /// <summary>
         /// Repositorio de Jogador
         /// </summary>
-        private readonly IRepository<Jogador> _repositorioJogador;
+        private readonly IRepositoryAsync<Jogador> _repositorioJogador;
 
         /// <summary>
         /// Constructor of <see cref="JogadoresController"/>
         /// </summary>
         /// <param name="repositorioJogador">Repositorio de Jogador</param>
-        public JogadoresController(IRepository<Jogador> repositorioJogador)
+        public JogadoresController(IRepositoryAsync<Jogador> repositorioJogador)
         {
             _repositorioJogador = repositorioJogador;
         }
@@ -36,17 +37,10 @@ namespace VarzeaFootballManager.Api.Controllers
         [ProducesResponseType(typeof(IEnumerable<JogadorGetAllDetailsViewModel>), (int)HttpStatusCode.OK)]
         public async Task<IActionResult> Get()
         {
-            var jogadores = await Task.Run(() => _repositorioJogador.FindAll().ToList());
+            var jogadores = await _repositorioJogador.FindAllAsync();
 
-            var result = jogadores.Select(jogador => new JogadorGetAllDetailsViewModel
-            {
-                Id = jogador.Id,
-                Nome = jogador.Nome,
-                Idade = jogador.Idade,
-                Nivel = jogador.Nivel,
-                Posicao = jogador.Posicao
-            }).ToList();
-
+            var result = Mapper.Map<JogadorGetAllViewModel>(jogadores);
+            
             return Ok(result);
         }
 
@@ -62,18 +56,22 @@ namespace VarzeaFootballManager.Api.Controllers
             if (string.IsNullOrWhiteSpace(id))
                 return BadRequest(new { message = $"O id='{id}' é inválido!" });
 
-            var jogador = await Task.Run(() => _repositorioJogador.Get(id));
+            var jogador = await _repositorioJogador.GetAsync(id);
 
-            return Ok(new JogadorGetSingleViewModel
-            {
-                Id = jogador.Id,
-                CreatedAt = jogador.CreatedAt,
-                ModifiedAt = jogador.ModifiedAt,
-                Nome = jogador.Nome,
-                Idade = jogador.Idade,
-                Posicao = jogador.Posicao,
-                Nivel = jogador.Nivel
-            });
+            var result = Mapper.Map<JogadorGetSingleViewModel>(jogador);
+
+            //var result = new JogadorGetSingleViewModel
+            //{
+            //    Id = jogador.Id,
+            //    CreatedAt = jogador.CreatedAt,
+            //    ModifiedAt = jogador.ModifiedAt,
+            //    Nome = jogador.Nome,
+            //    Idade = jogador.Idade,
+            //    Posicao = jogador.Posicao,
+            //    Nivel = jogador.Nivel,
+            //};
+
+            return Ok(result);
         }
 
         /// <summary>
@@ -87,27 +85,14 @@ namespace VarzeaFootballManager.Api.Controllers
         {
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
+            
+            var jogador = Mapper.Map<Jogador>(viewModel);
 
-            var jogador = new Jogador
-            {
-                Nome = viewModel.Nome,
-                Idade = viewModel.Idade,
-                Nivel = viewModel.Nivel,
-                Posicao = viewModel.Posicao
-            };
+            await _repositorioJogador.InsertAsync(jogador);
 
-            await Task.Run(() => _repositorioJogador.Insert(jogador));
-
-            return CreatedAtRoute("GetJogadorById", new { id = jogador.Id }, new JogadorGetSingleViewModel
-            {
-                Id = jogador.Id,
-                CreatedAt = jogador.CreatedAt,
-                ModifiedAt = jogador.ModifiedAt,
-                Nome = jogador.Nome,
-                Idade = jogador.Idade,
-                Posicao = jogador.Posicao,
-                Nivel = jogador.Nivel,
-            });
+            var result = Mapper.Map<JogadorGetSingleViewModel>(jogador);
+            
+            return base.CreatedAtRoute("GetJogadorById", new { id = jogador.Id }, result);
         }
 
         /// <summary>
@@ -127,28 +112,29 @@ namespace VarzeaFootballManager.Api.Controllers
             if (!ModelState.IsValid)
                 return BadRequest(ModelState);
 
-            var jogador = await Task.Run(() => _repositorioJogador.Get(id));
+            var jogador = await _repositorioJogador.GetAsync(id);
 
             if (jogador == null)
                 return NotFound();
 
-            jogador.Nome = viewModel.Nome;
-            jogador.Idade = viewModel.Idade;
-            jogador.Nivel = viewModel.Nivel;
-            jogador.Posicao = viewModel.Posicao;
+            await _repositorioJogador.UpdateAsync(jogador,
+                upd => upd.Set(j => j.Nome, viewModel.Nome),
+                upd => upd.Set(j => j.Idade, viewModel.Idade),
+                upd => upd.Set(j => j.Nivel, viewModel.Nivel),
+                upd => upd.Set(j => j.Posicao, viewModel.Posicao)
+            );
 
-            _repositorioJogador.Replace(jogador);
-            
-            return Ok(new JogadorGetSingleViewModel
+            await _repositorioJogador.UpdateAsync(jogador, new[]
             {
-                Id = jogador.Id,
-                CreatedAt = jogador.CreatedAt,
-                ModifiedAt = jogador.ModifiedAt,
-                Nome = jogador.Nome,
-                Idade = jogador.Idade,
-                Posicao = jogador.Posicao,
-                Nivel = jogador.Nivel,
+                _repositorioJogador.Updater.Set(j => j.Nome, viewModel.Nome),
+                _repositorioJogador.Updater.Set(j => j.Idade, viewModel.Idade),
+                _repositorioJogador.Updater.Set(j => j.Nivel, viewModel.Nivel),
+                _repositorioJogador.Updater.Set(j => j.Posicao, viewModel.Posicao)
             });
+
+            var result = Mapper.Map<JogadorGetSingleViewModel>(jogador);
+
+            return Ok(result);
         }
 
         /// <summary>
@@ -164,7 +150,7 @@ namespace VarzeaFootballManager.Api.Controllers
             if (string.IsNullOrWhiteSpace(id))
                 return BadRequest(new { message = $"O id='{id}' é inválido!" });
 
-            await Task.Run(() => _repositorioJogador.Delete(id));
+            await _repositorioJogador.DeleteAsync(id);
 
             return Ok($"Jogador {id} removido com sucesso!");
         }
